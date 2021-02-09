@@ -56,8 +56,10 @@ class Player:
                       (pos[0] * w + int(0.78 * w), pos[1] * h + int(0.15 * h))]
             pygame.draw.polygon(self.screen, (255, 255, 255), points, 0)
         else:
-            gfxdraw.aacircle(self.screen, pos[0] * w + 50, pos[1] * h + 50, 100, (255, 255, 255))
-            gfxdraw.filled_circle(self.screen, pos[0] * w + 50, pos[1] * h + 50, 100, (255, 255, 255))
+            gfxdraw.aacircle(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), 100, (255, 255, 255))
+            gfxdraw.filled_circle(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), 100, (255, 255, 255))
+            gfxdraw.aacircle(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), 80, (0, 0, 0))
+            gfxdraw.filled_circle(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), 80, (0, 0, 0))
         pygame.display.update()
 
 
