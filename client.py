@@ -1,6 +1,7 @@
 import pygame
 from sys import exit
 from pygame import gfxdraw
+from math import sqrt
 
 
 class Settings:
@@ -9,7 +10,6 @@ class Settings:
         self.screen_height = 800
         self.square_width = self.screen_width // 3
         self.square_height = self.screen_height // 3
-        self.ration = self.screen_width // self.screen_height
 
 
 class Player:
@@ -42,25 +42,38 @@ class Player:
                         self._drawCharacter((x, y), self.character)
 
     def _drawCharacter(self, pos, character):
+        if character == "X":
+            self._drawX(pos)
+        else:
+            self._drawO(pos)
+        pygame.display.update()
+
+    def _drawO(self, pos):
         w = self.settings.square_width
         h = self.settings.square_height
-        if character == "X":
-            points = [(pos[0] * w + int(0.15 * w), pos[1] * h + int(0.22 * h)),
-                      (pos[0] * w + int(0.22 * w), pos[1] * h + int(0.15 * h)),
-                      (pos[0] * w + int(0.85 * w), pos[1] * h + int(0.78 * h)),
-                      (pos[0] * w + int(0.78 * w), pos[1] * h + int(0.85 * h))]
-            pygame.draw.polygon(self.screen, (255, 255, 255), points)
-            points = [(pos[0] * w + int(0.15 * w), pos[1] * h + int(0.78 * h)),
-                      (pos[0] * w + int(0.22 * w), pos[1] * h + int(0.85 * h)),
-                      (pos[0] * w + int(0.85 * w), pos[1] * h + int(0.22 * h)),
-                      (pos[0] * w + int(0.78 * w), pos[1] * h + int(0.15 * h))]
-            pygame.draw.polygon(self.screen, (255, 255, 255), points, 0)
-        else:
-            gfxdraw.aacircle(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), 100, (255, 255, 255))
-            gfxdraw.filled_circle(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), 100, (255, 255, 255))
-            gfxdraw.aacircle(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), 80, (0, 0, 0))
-            gfxdraw.filled_circle(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), 80, (0, 0, 0))
-        pygame.display.update()
+        rx = self.settings.square_width // 2 - int(0.15 * w)
+        ry = self.settings.square_height // 2 - int(0.15 * h)
+        rx1 = rx - round(sqrt(2 * (int(0.22 * w) - int(0.15 * w)) ** 2))
+        ry1 = ry - round(sqrt(2 * (int(0.22 * h) - int(0.15 * h)) ** 2))
+        gfxdraw.aaellipse(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), rx, ry, (255, 255, 255))
+        gfxdraw.filled_ellipse(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), rx, ry,
+                               (255, 255, 255))
+        gfxdraw.aaellipse(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), rx1, ry1, (0, 0, 0))
+        gfxdraw.filled_ellipse(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), rx1, ry1, (0, 0, 0))
+
+    def _drawX(self, pos):
+        w = self.settings.square_width
+        h = self.settings.square_height
+        points = [(pos[0] * w + int(0.15 * w), pos[1] * h + int(0.22 * h)),
+                  (pos[0] * w + int(0.22 * w), pos[1] * h + int(0.15 * h)),
+                  (pos[0] * w + int(0.85 * w), pos[1] * h + int(0.78 * h)),
+                  (pos[0] * w + int(0.78 * w), pos[1] * h + int(0.85 * h))]
+        pygame.draw.polygon(self.screen, (255, 255, 255), points)
+        points = [(pos[0] * w + int(0.15 * w), pos[1] * h + int(0.78 * h)),
+                  (pos[0] * w + int(0.22 * w), pos[1] * h + int(0.85 * h)),
+                  (pos[0] * w + int(0.85 * w), pos[1] * h + int(0.22 * h)),
+                  (pos[0] * w + int(0.78 * w), pos[1] * h + int(0.15 * h))]
+        pygame.draw.polygon(self.screen, (255, 255, 255), points, 0)
 
 
 class TTTi:
