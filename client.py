@@ -1,115 +1,76 @@
 import pygame
+from network import Network
 from sys import exit
-from pygame import gfxdraw
-from math import sqrt
+from settings import ScreenSettings
+from player import Player
+from main_menu import MainMenu
 
 
-class Settings:
+class TTTi:
     def __init__(self):
-        self.screen_width = 800
-        self.screen_height = 800
-        self.square_width = self.screen_width // 3
-        self.square_height = self.screen_height // 3
+        pygame.init()
+        pygame.font.init()
+        self.new_game = False
+        self.screen_settings = ScreenSettings()
+        self.screen = pygame.display.set_mode((self.screen_settings.screen_width, self.screen_settings.screen_height))
+        pygame.display.set_caption("Tic Tac Toe")
 
+    def runMultiPlayer(self):
+        pass
 
-class Player:
-    def __init__(self, screen, settings, board, character):
-        self.screen = screen
-        self.settings = settings
-        self.board = board
-        self.character = character
-        self.turn = False
-        if character == "X":
-            self.turn = True
+    def runSinglePlayer(self, board):
+        p1 = Player(self.screen, self.screen_settings, board, "X")
+        p2 = Player(self.screen, self.screen_settings, board, "O")
+        self._makeBoard()
+        while True:
+            if self.new_game:
+                p1.checkEvents()
+                if not p1.turn:
+                    p2.turn = True
+                p2.checkEvents()
+                if not p2.turn:
+                    p1.turn = True
+            else:
+                self._resetClick()
 
-    def checkEvents(self):
+    def _makeBoard(self):
+        self.screen.fill((0, 0, 0))
+        pygame.draw.line(self.screen, (255, 255, 255), (self.screen_settings.square_width, 0),
+                         (self.screen_settings.square_width, self.screen_settings.square_height * 3))
+        pygame.draw.line(self.screen, (255, 255, 255), (self.screen_settings.square_width * 2, 0),
+                         (self.screen_settings.square_width * 2, self.screen_settings.square_height * 3))
+        pygame.draw.line(self.screen, (255, 255, 255), (0, self.screen_settings.square_height),
+                         (self.screen_settings.square_width * 3, self.screen_settings.square_height))
+        pygame.draw.line(self.screen, (255, 255, 255), (0, self.screen_settings.square_height * 2),
+                         (self.screen_settings.square_width * 3, self.screen_settings.square_height * 2))
+        pygame.display.update()
+
+    def _resetClick(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-        self._checkMOUSEBUTTONDOWN()
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:
+                    self.new_game = True
 
-    def _checkMOUSEBUTTONDOWN(self):
-        if pygame.mouse.get_pressed(num_buttons=3)[0]:
-            mouse_pos = pygame.mouse.get_pos()
-            if self.turn:
-                x = mouse_pos[0] // self.settings.square_width
-                y = mouse_pos[1] // self.settings.square_height
-                if x in [0, 1, 2] and y in [0, 1, 2]:
-                    if not self.board[y][x]:
-                        self.board[y][x] = self.character
-                        self.turn = False
-                        self._drawCharacter((x, y), self.character)
-
-    def _drawCharacter(self, pos, character):
-        if character == "X":
-            self._drawX(pos)
-        else:
-            self._drawO(pos)
-        pygame.display.update()
-
-    def _drawO(self, pos):
-        w = self.settings.square_width
-        h = self.settings.square_height
-        rx = self.settings.square_width // 2 - int(0.15 * w)
-        ry = self.settings.square_height // 2 - int(0.15 * h)
-        rx1 = rx - round(sqrt(2 * (int(0.22 * w) - int(0.15 * w)) ** 2))
-        ry1 = ry - round(sqrt(2 * (int(0.22 * h) - int(0.15 * h)) ** 2))
-        gfxdraw.aaellipse(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), rx, ry, (255, 255, 255))
-        gfxdraw.filled_ellipse(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), rx, ry,
-                               (255, 255, 255))
-        gfxdraw.aaellipse(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), rx1, ry1, (0, 0, 0))
-        gfxdraw.filled_ellipse(self.screen, pos[0] * w + int(0.5 * w), pos[1] * h + int(0.5 * h), rx1, ry1, (0, 0, 0))
-
-    def _drawX(self, pos):
-        w = self.settings.square_width
-        h = self.settings.square_height
-        points = [(pos[0] * w + int(0.15 * w), pos[1] * h + int(0.22 * h)),
-                  (pos[0] * w + int(0.22 * w), pos[1] * h + int(0.15 * h)),
-                  (pos[0] * w + int(0.85 * w), pos[1] * h + int(0.78 * h)),
-                  (pos[0] * w + int(0.78 * w), pos[1] * h + int(0.85 * h))]
-        pygame.draw.polygon(self.screen, (255, 255, 255), points)
-        points = [(pos[0] * w + int(0.15 * w), pos[1] * h + int(0.78 * h)),
-                  (pos[0] * w + int(0.22 * w), pos[1] * h + int(0.85 * h)),
-                  (pos[0] * w + int(0.85 * w), pos[1] * h + int(0.22 * h)),
-                  (pos[0] * w + int(0.78 * w), pos[1] * h + int(0.15 * h))]
-        pygame.draw.polygon(self.screen, (255, 255, 255), points, 0)
-
-
-class TTTi:
-    def __init__(self, board, character):
-        pygame.init()
-        self.settings = Settings()
-        self.screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
-        pygame.display.set_caption("Tic Tac Toe")
-
-        self.character = character
-        self.board = board
-        self.player = Player(self.screen, self.settings, self.board, character)
-        self.p2 = Player(self.screen, self.settings, self.board, "O")
-
-    def runGame(self):
-        self._makeBoard()
+    def mainMenu(self):
+        m = MainMenu(self.screen, self.screen_settings)
+        action = ""
         while True:
-            self.player.checkEvents()
-            if not self.player.turn:
-                self.p2.turn = True
-            self.p2.checkEvents()
-            if not self.p2.turn:
-                self.player.turn = True
-
-    def _makeBoard(self):
-        pygame.draw.line(self.screen, (255, 255, 255), (self.settings.square_width, 0),
-                         (self.settings.square_width, self.settings.square_height * 3))
-        pygame.draw.line(self.screen, (255, 255, 255), (self.settings.square_width * 2, 0),
-                         (self.settings.square_width * 2, self.settings.square_height * 3))
-        pygame.draw.line(self.screen, (255, 255, 255), (0, self.settings.square_height),
-                         (self.settings.square_width * 3, self.settings.square_height))
-        pygame.draw.line(self.screen, (255, 255, 255), (0, self.settings.square_height * 2),
-                         (self.settings.square_width * 3, self.settings.square_height * 2))
-        pygame.display.update()
+            action = m.checkEvents()
+            if action == "singleplayer":
+                self.runSinglePlayer([['', '', ''], ['', '', ''], ['', '', '']])
+            elif action == "multiplayer":
+                self.runMultiPlayer()
+            elif action == "settings":
+                pass
+            elif action == "quit":
+                pygame.quit()
+                exit()
+            m.draw()
 
 
 if __name__ == "__main__":
-    t = TTTi([['', '', ''], ['', '', ''], ['', '', '']], "X")
-    t.runGame()
+    t = TTTi()
+    t.mainMenu()
