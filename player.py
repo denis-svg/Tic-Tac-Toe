@@ -11,6 +11,7 @@ class Player:
         self.board = board
         self.character = character
         self.turn = False
+        self.clicked = False
         if character == "X":
             self.turn = True
 
@@ -19,7 +20,14 @@ class Player:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-        self._checkMOUSEBUTTONDOWN()
+            elif event.type == pygame.MOUSEBUTTONUP:
+                self.clicked = False
+            elif event.type == pygame.VIDEORESIZE:
+                self.screen_settings.changeResolution(event.w, event.h)
+                self.updateScreen()
+
+        if not self.clicked:
+            self._checkMOUSEBUTTONDOWN()
 
     def _checkMOUSEBUTTONDOWN(self):
         if pygame.mouse.get_pressed(num_buttons=3)[0]:
@@ -31,14 +39,8 @@ class Player:
                     if not self.board[y][x]:
                         self.board[y][x] = self.character
                         self.turn = False
-                        self._drawCharacter((x, y), self.character)
-
-    def _drawCharacter(self, pos, character):
-        if character == "X":
-            self._drawX(pos)
-        else:
-            self._drawO(pos)
-        pygame.display.update()
+                        self.clicked = True
+                        self.updateScreen()
 
     def _drawO(self, pos):
         w = self.screen_settings.square_width
@@ -66,3 +68,27 @@ class Player:
                   (pos[0] * w + int(0.85 * w), pos[1] * h + int(0.22 * h)),
                   (pos[0] * w + int(0.78 * w), pos[1] * h + int(0.15 * h))]
         pygame.draw.polygon(self.screen, (255, 255, 255), points, 0)
+
+    def makeBoard(self):
+        self.screen.fill((0, 0, 0))
+        pygame.draw.line(self.screen, (255, 255, 255), (self.screen_settings.square_width, 0),
+                         (self.screen_settings.square_width, self.screen_settings.square_height * 3))
+        pygame.draw.line(self.screen, (255, 255, 255), (self.screen_settings.square_width * 2, 0),
+                         (self.screen_settings.square_width * 2, self.screen_settings.square_height * 3))
+        pygame.draw.line(self.screen, (255, 255, 255), (0, self.screen_settings.square_height),
+                         (self.screen_settings.square_width * 3, self.screen_settings.square_height))
+        pygame.draw.line(self.screen, (255, 255, 255), (0, self.screen_settings.square_height * 2),
+                         (self.screen_settings.square_width * 3, self.screen_settings.square_height * 2))
+
+    def drawMoves(self):
+        for i in range(3):
+            for j in range(3):
+                if self.board[i][j] == "X":
+                    self._drawX((j, i))
+                elif self.board[i][j] == "O":
+                    self._drawO((j, i))
+
+    def updateScreen(self):
+        self.makeBoard()
+        self.drawMoves()
+        pygame.display.update()

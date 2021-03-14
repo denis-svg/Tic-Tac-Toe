@@ -106,6 +106,11 @@ class MainMenu:
                     for button in self.buttons:
                         if button.click(mouse_pos):
                             return button.text
+            elif event.type == pygame.VIDEORESIZE:
+                self.screen_settings.changeResolution(event.w, event.h)
+                self.bg_image = self._getBgImg()
+                self.buttons = self._getButtons()
+
         for button in self.buttons:
             if button.mouseIsOver(mouse_pos):
                 button.change(False)
