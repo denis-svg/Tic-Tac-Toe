@@ -12,6 +12,7 @@ class Player:
         self.character = character
         self.turn = False
         self.clicked = False
+        self.playing = True
         if character == "X":
             self.turn = True
 
@@ -26,7 +27,10 @@ class Player:
                 self.screen_settings.changeResolution(event.w, event.h)
                 self.updateScreen()
 
-        if not self.clicked:
+        if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+            self.playing = False
+
+        if not self.clicked and self.playing:
             self._checkMOUSEBUTTONDOWN()
 
     def _checkMOUSEBUTTONDOWN(self):
