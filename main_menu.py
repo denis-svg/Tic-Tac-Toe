@@ -46,6 +46,7 @@ class MainMenu:
         self.button_font = pygame.font.SysFont("ubuntu", 160, False, False)
         self.bg_image = self._getBgImg()
         self.buttons = self._getButtons()
+        self.need_changes = False
 
     def _getBgImg(self):
         w, h = round(self.screen_settings.screen_width * (2 / 3)), round(self.screen_settings.screen_height * 0.25)
@@ -96,6 +97,11 @@ class MainMenu:
         pygame.display.update()
 
     def checkEvents(self):
+        if self.need_changes:
+            self.bg_image = self._getBgImg()
+            self.buttons = self._getButtons()
+            self.need_changes = False
+
         mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

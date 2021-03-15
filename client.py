@@ -27,14 +27,23 @@ class TTTi:
             if self.new_game:
                 if not p2.clicked:
                     p1.checkEvents()
+                    if not p1.playing:
+                        self.new_game = False
+                        break
                 if not p1.turn:
                     p2.turn = True
                 if not p1.clicked:
                     p2.checkEvents()
+                    if not p2.playing:
+                        self.new_game = False
+                        break
                 if not p2.turn:
                     p1.turn = True
             else:
                 self._resetClick()
+
+    def runSettings(self):
+        pass
 
     def _resetClick(self):
         for event in pygame.event.get():
@@ -51,6 +60,8 @@ class TTTi:
             action = m.checkEvents()
             if action == "singleplayer":
                 self.runSinglePlayer([['', '', ''], ['', '', ''], ['', '', '']])
+                m.need_changes = True
+                continue
             elif action == "multiplayer":
                 self.runMultiPlayer()
             elif action == "settings":
