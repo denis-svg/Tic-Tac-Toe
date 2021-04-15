@@ -1,41 +1,6 @@
 import pygame
 from sys import exit
-
-
-class Button:
-    def __init__(self, screen, text, x, y, w, h, img1, img2):
-        self.screen = screen
-        self.text = text
-        self.x = x
-        self.y = y
-        self.w = w
-        self.h = h
-        self.img1 = img1
-        self.img2 = img2
-        self.pressed = False
-
-    def draw(self):
-        if not self.pressed:
-            self.screen.blit(self.img1, (self.x, self.y))
-        else:
-            self.screen.blit(self.img2, (self.x, self.y))
-
-    def click(self, pos):
-        x1 = pos[0]
-        y1 = pos[1]
-        if self.x <= x1 <= self.x + self.w and self.y <= y1 <= self.y + self.h:
-            return True
-        return False
-
-    def mouseIsOver(self, pos):
-        x1 = pos[0]
-        y1 = pos[1]
-        if self.x <= x1 <= self.x + self.w and self.y <= y1 <= self.y + self.h:
-            return False
-        return True
-
-    def change(self, mode):
-        self.pressed = mode
+from button import SimpleButton as Button
 
 
 class MainMenu:
@@ -46,7 +11,11 @@ class MainMenu:
         self.button_font = pygame.font.SysFont("ubuntu", 160, False, False)
         self.bg_image = self._getBgImg()
         self.buttons = self._getButtons()
-        self.need_changes = False
+        self.previous_buttons_state = [False, False, False, False]
+        self.need_screen_changes = False
+        self.need_draw_changes = True
+        self.clicked = False
+        self.target = ""
 
     def _getBgImg(self):
         w, h = round(self.screen_settings.screen_width * (2 / 3)), round(self.screen_settings.screen_height * 0.25)
@@ -88,6 +57,12 @@ class MainMenu:
 
         return buttons
 
+    def changeInButtonState(self):
+        for i, button in enumerate(self.buttons):
+            if self.previous_buttons_state[i] != button.pressed:
+                return True
+        return False
+
     def draw(self):
         self.screen.fill((0, 0, 0))
         x, y = round(self.screen_settings.screen_width * (1 / 6)), round(self.screen_settings.screen_height * (1 / 6))
@@ -97,25 +72,32 @@ class MainMenu:
         pygame.display.update()
 
     def checkEvents(self):
-        if self.need_changes:
+        if self.need_screen_changes:
             self.bg_image = self._getBgImg()
             self.buttons = self._getButtons()
-            self.need_changes = False
-
+            self.need_screen_changes = False
         mouse_pos = pygame.mouse.get_pos()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
+            elif event.type == pygame.MOUSEBUTTONUP:
                 if event.button == 1:
                     for button in self.buttons:
                         if button.click(mouse_pos):
-                            return button.text
+                            if button.text == self.target:
+                                self.clicked = False
+                                return button.text
+                self.clicked = False
+
             elif event.type == pygame.VIDEORESIZE:
                 self.screen_settings.changeResolution(event.w, event.h)
                 self.bg_image = self._getBgImg()
                 self.buttons = self._getButtons()
+                self.need_draw_changes = True
+
+        if pygame.key.get_pressed()[pygame.K_ESCAPE]:
+            return "break"
 
         for button in self.buttons:
             if button.mouseIsOver(mouse_pos):
@@ -123,9 +105,18 @@ class MainMenu:
             else:
                 button.change(True)
 
-        if pygame.mouse.get_pressed(num_buttons=3)[0]:
+        if self.changeInButtonState():
+            self.need_draw_changes = True
+
+        for i, button in enumerate(self.buttons):
+            self.previous_buttons_state[i] = button.pressed
+
+        if pygame.mouse.get_pressed(num_buttons=3)[0] and not self.clicked:
             for button in self.buttons:
                 if button.click(mouse_pos):
-                    return button.text
-
+                    self.clicked = True
+                    self.target = button.text
+            if not self.clicked:
+                self.target = "None"
+                self.clicked = True
         return ""

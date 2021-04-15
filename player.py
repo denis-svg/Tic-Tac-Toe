@@ -22,7 +22,8 @@ class Player:
                 pygame.quit()
                 exit()
             elif event.type == pygame.MOUSEBUTTONUP:
-                self.clicked = False
+                if event.button == 1:
+                    self.clicked = False
             elif event.type == pygame.VIDEORESIZE:
                 self.screen_settings.changeResolution(event.w, event.h)
                 self.updateScreen()
