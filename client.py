@@ -26,7 +26,6 @@ class TTTi:
         clock = pygame.time.Clock()
         while True:
             clock.tick()
-            print(clock.get_fps())
             if not p2.clicked:
                 p1.checkEvents()
                 if not p1.playing:
@@ -100,7 +99,7 @@ class TTTi:
                 m.need_screen_changes = True
                 m.need_draw_changes = True
                 continue
-            elif action == "quit" or action == "break":
+            elif action == "quit":
                 pygame.quit()
                 exit()
             if m.need_draw_changes:
