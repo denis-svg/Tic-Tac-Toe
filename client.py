@@ -45,31 +45,31 @@ class TTTi:
         while True:
             clock.tick()
             action = s.checkEvents()
-            if action == "300x300":
+            if action == "300x300" and (self.screen_settings.screen_width != 300 or self.screen_settings.screen_width != 300):
                 self.screen = pygame.display.set_mode((300, 300), pygame.RESIZABLE)
                 self.screen_settings.changeResolution(300, 300)
                 s.need_draw_changes = True
                 s.need_screen_changes = True
                 continue
-            elif action == "450x450":
+            elif action == "450x450" and (self.screen_settings.screen_width != 450 or self.screen_settings.screen_width != 450):
                 self.screen = pygame.display.set_mode((450, 450), pygame.RESIZABLE)
                 self.screen_settings.changeResolution(450, 450)
                 s.need_draw_changes = True
                 s.need_screen_changes = True
                 continue
-            elif action == "600x600":
+            elif action == "600x600" and (self.screen_settings.screen_width != 600 or self.screen_settings.screen_width != 600):
                 self.screen = pygame.display.set_mode((600, 600), pygame.RESIZABLE)
                 self.screen_settings.changeResolution(600, 600)
                 s.need_draw_changes = True
                 s.need_screen_changes = True
                 continue
-            elif action == "750x750":
+            elif action == "750x750" and (self.screen_settings.screen_width != 750 or self.screen_settings.screen_width != 750):
                 self.screen = pygame.display.set_mode((750, 750), pygame.RESIZABLE)
                 self.screen_settings.changeResolution(750, 750)
                 s.need_draw_changes = True
                 s.need_screen_changes = True
                 continue
-            elif action == "900x900":
+            elif action == "900x900" and (self.screen_settings.screen_width != 900 or self.screen_settings.screen_width != 900):
                 self.screen = pygame.display.set_mode((900, 900), pygame.RESIZABLE)
                 self.screen_settings.changeResolution(900, 900)
                 s.need_draw_changes = True
