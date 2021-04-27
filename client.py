@@ -5,6 +5,7 @@ from settings import ScreenSettings
 from player import Player
 from main_menu import MainMenu
 from settings_menu import SettingsMenu
+from game import SinglePlayerGame
 
 
 class TTTi:
@@ -19,25 +20,17 @@ class TTTi:
     def runMultiPlayer(self):
         pass
 
-    def runSinglePlayer(self, board):
-        p1 = Player(self.screen, self.screen_settings, board, "X")
-        p2 = Player(self.screen, self.screen_settings, board, "O")
-        p1.updateScreen()
+    def runSinglePlayer(self):
+        game = SinglePlayerGame(self.screen, self.screen_settings, Player("X"), Player("O"))
+        game.updateScreen()
         clock = pygame.time.Clock()
         while True:
             clock.tick()
-            if not p2.clicked:
-                p1.checkEvents()
-                if not p1.playing:
-                    break
-            if not p1.turn:
-                p2.turn = True
-            if not p1.clicked:
-                p2.checkEvents()
-                if not p2.playing:
-                    break
-            if not p2.turn:
-                p1.turn = True
+            game.checkEvents()
+            if not game.playing:
+                break
+            if game.move_has_made:
+                game.checkWin()
 
     def runSettings(self):
         s = SettingsMenu(self.screen, self.screen_settings)
@@ -88,7 +81,7 @@ class TTTi:
             clock.tick()
             action = m.checkEvents()
             if action == "singleplayer":
-                self.runSinglePlayer([['', '', ''], ['', '', ''], ['', '', '']])
+                self.runSinglePlayer()
                 m.need_screen_changes = True
                 m.need_draw_changes = True
                 continue
