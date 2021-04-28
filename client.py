@@ -24,13 +24,25 @@ class TTTi:
         game = SinglePlayerGame(self.screen, self.screen_settings, Player("X"), Player("O"))
         game.updateScreen()
         clock = pygame.time.Clock()
+        winner = "No winner"
         while True:
             clock.tick()
             game.checkEvents()
             if not game.playing:
                 break
             if game.move_has_made:
-                game.checkWin()
+                game.updateScreen()
+                winner = game.checkWin()
+            if winner == "X":
+                game.playerX_wins += 1
+            elif winner == "O":
+                game.playerO_wins += 1
+            elif winner == "Tie":
+                game.ties += 1
+            if winner != "No winner":
+                game.resetGame()
+                game.updateScreen()
+                winner = "No winner"
 
     def runSettings(self):
         s = SettingsMenu(self.screen, self.screen_settings)

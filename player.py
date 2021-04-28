@@ -10,7 +10,7 @@ class Player:
         self.clicked = False
         self.playing = True
 
-    def checkEvents(self, screen, screen_settings, board, move):
+    def checkEvents(self, screen, screen_settings, board):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -26,18 +26,20 @@ class Player:
             self.playing = False
 
         if not self.clicked and self.playing:
-            self._checkMOUSEBUTTONDOWN(screen_settings, board, move)
+            return self._checkMOUSEBUTTONDOWN(screen_settings, board)
 
-    def _checkMOUSEBUTTONDOWN(self, screen_settings, board, move):
+        return None, None
+
+    def _checkMOUSEBUTTONDOWN(self, screen_settings, board):
         if pygame.mouse.get_pressed(num_buttons=3)[0]:
             mouse_pos = pygame.mouse.get_pos()
             x = mouse_pos[0] // screen_settings.square_width
             y = mouse_pos[1] // screen_settings.square_height
             if x in [0, 1, 2] and y in [0, 1, 2]:
                 if not board[y][x]:
-                    move(y, x)
                     self.clicked = True
-            return y, x
+                    return y, x
+        return None, None
 
     @staticmethod
     def _drawO(screen, screen_settings, pos):

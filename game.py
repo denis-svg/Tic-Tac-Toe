@@ -1,35 +1,14 @@
-class SinglePlayerGame:
-    def __init__(self, screen, screen_settings, p1, p2):
+class Game:
+    def __init__(self):
         self.board = [['', '', ''],
                       ['', '', ''],
                       ['', '', '']]
-        self.screen = screen
-        self.screen_settings = screen_settings
         self.playerX_turn = True
         self.playerO_turn = False
         self.playerX_wins = 0
         self.playerO_wins = 0
         self.ties = 0
-        self.p1 = p1
-        self.p2 = p2
         self.move_has_made = False
-        self.playing = True
-
-    def updateScreen(self):
-        self.p1.updateScreen(self.screen, self.screen_settings, self.board)
-
-    def checkEvents(self):
-        self.move_has_made = False
-        if not self.p2.clicked:
-            self.p1.checkEvents(self.screen, self.screen_settings, self.board, self.move)
-            if not self.p1.playing:
-                self.status = False
-                return
-        if not self.p1.clicked:
-            self.p2.checkEvents(self.screen, self.screen_settings, self.board, self.move)
-            if not self.p2.playing:
-                self.status = False
-                return
 
     def move(self, row, col):
         if row in [0, 1, 2] and col in [0, 1, 2]:
@@ -39,9 +18,7 @@ class SinglePlayerGame:
                 else:
                     self.board[row][col] = "O"
                 self.playerX_turn, self.playerO_turn = self.playerO_turn, self.playerX_turn
-                self.updateScreen()
                 self.move_has_made = True
-
 
     def resetGame(self):
         self.board = [['', '', ''],
@@ -54,22 +31,18 @@ class SinglePlayerGame:
     def checkWin(self):
         winner = self.checkRows()
         if winner != "No winner":
-            self.handleWin(winner)
             return winner
 
         winner = self.checkCols()
         if winner != "No winner":
-            self.handleWin(winner)
             return winner
 
         winner = self.checkDiagonals()
         if winner != "No winner":
-            self.handleWin(winner)
             return winner
 
         if self.isFull():
             winner = "Tie"
-            self.handleWin(winner)
             return winner
 
         return winner
@@ -101,18 +74,43 @@ class SinglePlayerGame:
             for j in range(3):
                 if not self.board[i][j]:
                     return False
-
         return True
 
-    def handleWin(self, winner):
-        if winner == "Tie":
-            self.ties += 1
 
-        elif winner == "O":
-            self.playerO_wins += 1
+class SinglePlayerGame(Game):
+    def __init__(self, screen, screen_settings, p1, p2):
+        super().__init__()
+        self.board = [['', '', ''],
+                      ['', '', ''],
+                      ['', '', '']]
+        self.screen = screen
+        self.screen_settings = screen_settings
+        self.p1 = p1
+        self.p2 = p2
+        self.playing = True
 
-        elif winner == "X":
-            self.playerX_wins += 1
-        print(winner)
-        self.resetGame()
-        self.updateScreen()
+    def updateScreen(self):
+        self.p1.updateScreen(self.screen, self.screen_settings, self.board)
+
+    def checkEvents(self):
+        self.move_has_made = False
+        if not self.p2.clicked:
+            row, col = self.p1.checkEvents(self.screen, self.screen_settings, self.board)
+            if row is not None and col is not None:
+                self.move(row, col)
+            if not self.p1.playing:
+                self.playing = False
+                return
+        if not self.p1.clicked:
+            row, col = self.p2.checkEvents(self.screen, self.screen_settings, self.board)
+            if row is not None and col is not None:
+                self.move(row, col)
+            if not self.p2.playing:
+                self.playing = False
+                return
+
+
+class Multiplayer(Game):
+    def __init__(self, game_id):
+        super().__init__()
+        self.game_id = game_id
