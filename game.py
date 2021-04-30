@@ -8,6 +8,7 @@ class Game:
         self.playerX_wins = 0
         self.playerO_wins = 0
         self.ties = 0
+        self.cells = []
         self.move_has_made = False
 
     def move(self, row, col):
@@ -27,6 +28,7 @@ class Game:
         self.playerX_turn = True
         self.playerO_turn = False
         self.move_has_made = False
+        self.cells = []
 
     def checkWin(self):
         winner = self.checkRows()
@@ -50,6 +52,7 @@ class Game:
     def checkRows(self):
         for i in range(3):
             if self.board[i][0] == self.board[i][1] and self.board[i][0] == self.board[i][2] and self.board[i][0]:
+                self.cells = [(i, j) for j in range(3)]
                 return self.board[i][0]
 
         return "No winner"
@@ -57,14 +60,17 @@ class Game:
     def checkCols(self):
         for j in range(3):
             if self.board[0][j] == self.board[1][j] == self.board[2][j] and self.board[0][j]:
+                self.cells = [(i, j) for i in range(3)]
                 return self.board[0][j]
 
         return "No winner"
 
     def checkDiagonals(self):
         if self.board[0][0] == self.board[1][1] == self.board[2][2] and self.board[0][0]:
+            self.cells = [(0, 0), (1, 1), (2, 2)]
             return self.board[0][0]
         elif self.board[0][2] == self.board[1][1] == self.board[2][0] and self.board[0][2]:
+            self.cells = [(0, 2), (1, 1), (2, 0)]
             return self.board[0][2]
 
         return "No winner"
@@ -80,9 +86,9 @@ class Game:
 class SinglePlayerGame(Game):
     def __init__(self, screen, screen_settings, p1, p2):
         super().__init__()
-        self.board = [['', '', ''],
-                      ['', '', ''],
-                      ['', '', '']]
+        self.board = [['X', 'O', 'X'],
+                      ['X', 'O', 'O'],
+                      ['O', 'X', '']]
         self.screen = screen
         self.screen_settings = screen_settings
         self.p1 = p1
@@ -108,6 +114,9 @@ class SinglePlayerGame(Game):
             if not self.p2.playing:
                 self.playing = False
                 return
+
+    def afterMatchAnimation(self, winner, disappear):
+        self.p1.afterMatchAnimation(self.screen, self.screen_settings, winner, self.cells, disappear)
 
 
 class Multiplayer(Game):

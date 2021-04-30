@@ -6,6 +6,7 @@ from player import Player
 from main_menu import MainMenu
 from settings_menu import SettingsMenu
 from game import SinglePlayerGame
+from time import time
 
 
 class TTTi:
@@ -24,25 +25,39 @@ class TTTi:
         game = SinglePlayerGame(self.screen, self.screen_settings, Player("X"), Player("O"))
         game.updateScreen()
         clock = pygame.time.Clock()
+        i = 1
+        animation = False
         winner = "No winner"
         while True:
             clock.tick()
             game.checkEvents()
             if not game.playing:
                 break
-            if game.move_has_made:
+            if game.move_has_made and not animation:
                 game.updateScreen()
                 winner = game.checkWin()
-            if winner == "X":
+            if winner == "X" and not animation:
                 game.playerX_wins += 1
-            elif winner == "O":
+                animation = True
+            elif winner == "O" and not animation:
                 game.playerO_wins += 1
-            elif winner == "Tie":
+                animation = True
+            elif winner == "Tie" and not animation:
                 game.ties += 1
+                animation = True
             if winner != "No winner":
-                game.resetGame()
-                game.updateScreen()
-                winner = "No winner"
+                if i <= 10:
+                    if i % 2 != 0:
+                        game.afterMatchAnimation(winner, disappear=True)
+                    else:
+                        game.afterMatchAnimation(winner, disappear=False)
+                else:
+                    game.resetGame()
+                    game.updateScreen()
+                    winner = "No winner"
+                    animation = False
+                    i = 1
+                i += 1
 
     def runSettings(self):
         s = SettingsMenu(self.screen, self.screen_settings)
