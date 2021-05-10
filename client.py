@@ -1,12 +1,12 @@
 import pygame
 from network import Network
 from sys import exit
+import threading
 from settings import ScreenSettings
 from player import Player
 from main_menu import MainMenu
 from settings_menu import SettingsMenu
 from game import SinglePlayerGame
-from time import time
 
 
 class TTTi:
@@ -25,39 +25,35 @@ class TTTi:
         game = SinglePlayerGame(self.screen, self.screen_settings, Player("X"), Player("O"))
         game.updateScreen()
         clock = pygame.time.Clock()
-        i = 1
-        animation = False
-        winner = "No winner"
+        animation_in_process = False
+        threads = []
         while True:
             clock.tick()
             game.checkEvents()
+            # print(clock.get_fps())
             if not game.playing:
                 break
-            if game.move_has_made and not animation:
+            if game.move_has_made and not game.finished:
                 game.updateScreen()
-                winner = game.checkWin()
-            if winner == "X" and not animation:
-                game.playerX_wins += 1
-                animation = True
-            elif winner == "O" and not animation:
-                game.playerO_wins += 1
-                animation = True
-            elif winner == "Tie" and not animation:
-                game.ties += 1
-                animation = True
-            if winner != "No winner":
-                if i <= 10:
-                    if i % 2 != 0:
-                        game.afterMatchAnimation(winner, disappear=True)
-                    else:
-                        game.afterMatchAnimation(winner, disappear=False)
-                else:
+                game.checkWin()
+            if game.winner != "No winner" and not animation_in_process:
+                thread = threading.Thread(target=Player.afterMatchAnimation,
+                                          args=(self.screen, self.screen_settings, game, game.winner, game.cells))
+                threads.append(thread)
+                thread.start()
+                print(game.stats)
+                animation_in_process = True
+            if animation_in_process:
+                if not threads[0].is_alive():
+                    animation_in_process = False
                     game.resetGame()
                     game.updateScreen()
-                    winner = "No winner"
-                    animation = False
-                    i = 1
-                i += 1
+                    game.winner = "No winner"
+                    game.finished = False
+                    threads.pop()
+            if animation_in_process and game.need_screen_update:
+                pygame.display.update()
+                game.need_screen_update = False
 
     def runSettings(self):
         s = SettingsMenu(self.screen, self.screen_settings)

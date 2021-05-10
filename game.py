@@ -5,11 +5,13 @@ class Game:
                       ['', '', '']]
         self.playerX_turn = True
         self.playerO_turn = False
-        self.playerX_wins = 0
-        self.playerO_wins = 0
-        self.ties = 0
+        self.stats = {"Tie": 0,
+                      "X": 0,
+                      "O": 0}
         self.cells = []
         self.move_has_made = False
+        self.finished = False
+        self.winner = "No winner"
 
     def move(self, row, col):
         if row in [0, 1, 2] and col in [0, 1, 2]:
@@ -31,49 +33,50 @@ class Game:
         self.cells = []
 
     def checkWin(self):
-        winner = self.checkRows()
-        if winner != "No winner":
-            return winner
+        self.checkRows()
+        if self.winner != "No winner":
+            self.finished = True
+            self.stats[self.winner] += 1
+            return
 
-        winner = self.checkCols()
-        if winner != "No winner":
-            return winner
+        self.checkCols()
+        if self.winner != "No winner":
+            self.finished = True
+            self.stats[self.winner] += 1
+            return
 
-        winner = self.checkDiagonals()
-        if winner != "No winner":
-            return winner
+        self.checkDiagonals()
+        if self.winner != "No winner":
+            self.finished = True
+            self.stats[self.winner] += 1
+            return
 
         if self.isFull():
-            winner = "Tie"
-            return winner
-
-        return winner
+            self.winner = "Tie"
+            self.finished = True
+            self.stats[self.winner] += 1
 
     def checkRows(self):
         for i in range(3):
             if self.board[i][0] == self.board[i][1] and self.board[i][0] == self.board[i][2] and self.board[i][0]:
                 self.cells = [(i, j) for j in range(3)]
-                return self.board[i][0]
-
-        return "No winner"
+                self.winner = self.board[i][0]
+                return
 
     def checkCols(self):
         for j in range(3):
             if self.board[0][j] == self.board[1][j] == self.board[2][j] and self.board[0][j]:
                 self.cells = [(i, j) for i in range(3)]
-                return self.board[0][j]
-
-        return "No winner"
+                self.winner = self.board[0][j]
+                return
 
     def checkDiagonals(self):
         if self.board[0][0] == self.board[1][1] == self.board[2][2] and self.board[0][0]:
             self.cells = [(0, 0), (1, 1), (2, 2)]
-            return self.board[0][0]
+            self.winner = self.board[0][0]
         elif self.board[0][2] == self.board[1][1] == self.board[2][0] and self.board[0][2]:
             self.cells = [(0, 2), (1, 1), (2, 0)]
-            return self.board[0][2]
-
-        return "No winner"
+            self.winner = self.board[0][2]
 
     def isFull(self):
         for i in range(3):
@@ -88,9 +91,10 @@ class SinglePlayerGame(Game):
         super().__init__()
         self.board = [['X', 'O', 'X'],
                       ['X', 'O', 'O'],
-                      ['O', 'X', '']]
+                      ['O', '', '']]
         self.screen = screen
         self.screen_settings = screen_settings
+        self.need_screen_update = False
         self.p1 = p1
         self.p2 = p2
         self.playing = True
@@ -114,9 +118,6 @@ class SinglePlayerGame(Game):
             if not self.p2.playing:
                 self.playing = False
                 return
-
-    def afterMatchAnimation(self, winner, disappear):
-        self.p1.afterMatchAnimation(self.screen, self.screen_settings, winner, self.cells, disappear)
 
 
 class Multiplayer(Game):

@@ -99,7 +99,7 @@ class Player:
         pygame.display.update()
 
     @staticmethod
-    def afterMatchAnimation(screen, screen_settings, winner, cells, disappear):
+    def frameAnimation(screen, screen_settings, winner, cells, disappear):
         if not disappear:
             if winner == "X":
                 for cell in cells:
@@ -118,4 +118,16 @@ class Player:
                     Player._drawO(screen, screen_settings, (cell[1], cell[0]), color=(0, 0, 0))
             elif winner == "Tie":
                 Player.makeBoard(screen, screen_settings, color=(0, 0, 0), draw_bg=False)
-        pygame.display.update()
+
+    @staticmethod
+    def afterMatchAnimation(screen, screen_settings, game, winner, cells):
+        counter = 0
+        clock = pygame.time.Clock()
+        while counter < 14:
+            clock.tick(13)
+            if counter % 2 == 0:
+                Player.frameAnimation(screen, screen_settings, winner, cells, True)
+            else:
+                Player.frameAnimation(screen, screen_settings, winner, cells, False)
+            game.need_screen_update = True
+            counter += 1
