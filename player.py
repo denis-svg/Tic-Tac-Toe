@@ -10,7 +10,7 @@ class Player:
         self.clicked = False
         self.playing = True
 
-    def checkEvents(self, screen, screen_settings, board):
+    def checkEvents(self, screen, screen_settings, game):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -20,13 +20,13 @@ class Player:
                     self.clicked = False
             elif event.type == pygame.VIDEORESIZE:
                 screen_settings.changeResolution(event.w, event.h)
-                Player.updateScreen(screen, screen_settings, board)
+                Player.updateScreen(screen, screen_settings, game.board)
 
         if pygame.key.get_pressed()[pygame.K_ESCAPE]:
             self.playing = False
 
-        if not self.clicked and self.playing:
-            return self._checkMOUSEBUTTONDOWN(screen_settings, board)
+        if not self.clicked and self.playing and game.winner == "No winner":
+            return self._checkMOUSEBUTTONDOWN(screen_settings, game.board)
 
         return None, None
 
@@ -99,7 +99,13 @@ class Player:
         pygame.display.update()
 
     @staticmethod
-    def frameAnimation(screen, screen_settings, winner, cells, disappear):
+    def frameAnimation(screen, screen_settings, board, winner, cells, disappear):
+        for i in range(3):
+            for j in range(3):
+                if board[i][j] == "O" and (i, j) not in cells:
+                    Player._drawO(screen, screen_settings, (j, i), color=(180, 180, 180))
+                elif board[i][j] == "X" and (i, j) not in cells:
+                    Player._drawX(screen, screen_settings, (j, i), color=(180, 180, 180))
         if not disappear:
             if winner == "X":
                 for cell in cells:
@@ -120,14 +126,23 @@ class Player:
                 Player.makeBoard(screen, screen_settings, color=(0, 0, 0), draw_bg=False)
 
     @staticmethod
-    def afterMatchAnimation(screen, screen_settings, game, winner, cells):
+    def afterMatchAnimation(screen, screen_settings, game):
         counter = 0
         clock = pygame.time.Clock()
         while counter < 14:
             clock.tick(13)
             if counter % 2 == 0:
-                Player.frameAnimation(screen, screen_settings, winner, cells, True)
+                Player.frameAnimation(screen, screen_settings, game.board, game.winner, game.cells, True)
             else:
-                Player.frameAnimation(screen, screen_settings, winner, cells, False)
+                Player.frameAnimation(screen, screen_settings, game.board, game.winner, game.cells, False)
             game.need_screen_update = True
             counter += 1
+
+        counter = 0
+        while counter < 14:
+            clock.tick(13)
+            Player.frameAnimation(screen, screen_settings, game.board, game.winner, game.cells, False)
+            game.need_screen_update = True
+            counter += 1
+
+

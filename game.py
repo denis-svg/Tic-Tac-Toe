@@ -105,14 +105,14 @@ class SinglePlayerGame(Game):
     def checkEvents(self):
         self.move_has_made = False
         if not self.p2.clicked:
-            row, col = self.p1.checkEvents(self.screen, self.screen_settings, self.board)
+            row, col = self.p1.checkEvents(self.screen, self.screen_settings, self)
             if row is not None and col is not None:
                 self.move(row, col)
             if not self.p1.playing:
                 self.playing = False
                 return
         if not self.p1.clicked:
-            row, col = self.p2.checkEvents(self.screen, self.screen_settings, self.board)
+            row, col = self.p2.checkEvents(self.screen, self.screen_settings, self)
             if row is not None and col is not None:
                 self.move(row, col)
             if not self.p2.playing:

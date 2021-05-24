@@ -38,7 +38,7 @@ class TTTi:
                 game.checkWin()
             if game.winner != "No winner" and not animation_in_process:
                 thread = threading.Thread(target=Player.afterMatchAnimation,
-                                          args=(self.screen, self.screen_settings, game, game.winner, game.cells))
+                                          args=(self.screen, self.screen_settings, game))
                 threads.append(thread)
                 thread.start()
                 print(game.stats)
