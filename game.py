@@ -1,6 +1,3 @@
-import threading
-
-
 class Game:
     def __init__(self):
         self.board = [['', '', ''],
