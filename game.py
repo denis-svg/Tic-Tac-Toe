@@ -1,3 +1,6 @@
+import threading
+
+
 class Game:
     def __init__(self):
         self.board = [['', '', ''],
@@ -29,8 +32,10 @@ class Game:
                       ['', '', '']]
         self.playerX_turn = True
         self.playerO_turn = False
-        self.move_has_made = False
         self.cells = []
+        self.move_has_made = False
+        self.finished = False
+        self.winner = "No winner"
 
     def checkWin(self):
         self.checkRows()
@@ -89,9 +94,9 @@ class Game:
 class SinglePlayerGame(Game):
     def __init__(self, screen, screen_settings, p1, p2):
         super().__init__()
-        self.board = [['X', 'O', 'X'],
-                      ['X', 'O', 'O'],
-                      ['O', '', '']]
+        self.board = [['', '', ''],
+                      ['', '', ''],
+                      ['', '', '']]
         self.screen = screen
         self.screen_settings = screen_settings
         self.need_screen_update = False
@@ -104,20 +109,31 @@ class SinglePlayerGame(Game):
 
     def checkEvents(self):
         self.move_has_made = False
-        if not self.p2.clicked:
-            row, col = self.p1.checkEvents(self.screen, self.screen_settings, self)
-            if row is not None and col is not None:
-                self.move(row, col)
+        if self.playerX_turn:
+            self.p1.checkEvents(self.screen, self.screen_settings, self)
             if not self.p1.playing:
                 self.playing = False
                 return
-        if not self.p1.clicked:
-            row, col = self.p2.checkEvents(self.screen, self.screen_settings, self)
-            if row is not None and col is not None:
-                self.move(row, col)
+            self.move(self.p1.place[1], self.p1.place[0])
+        elif self.playerO_turn or self.p2.clicked:
+            self.p2.checkEvents(self.screen, self.screen_settings, self)
             if not self.p2.playing:
                 self.playing = False
                 return
+            self.move(self.p2.place[1], self.p2.place[0])
+
+    def resetGame(self):
+        self.board = [['', '', ''],
+                      ['', '', ''],
+                      ['', '', '']]
+        self.playerX_turn = True
+        self.playerO_turn = False
+        self.move_has_made = False
+        self.cells = []
+        self.p1.place = (-1, -1)
+        self.p2.place = (-1, -1)
+        self.finished = False
+        self.winner = "No winner"
 
 
 class Multiplayer(Game):

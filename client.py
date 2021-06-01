@@ -30,13 +30,15 @@ class TTTi:
         while True:
             clock.tick()
             game.checkEvents()
-            # print(clock.get_fps())
             if not game.playing:
                 break
             if game.move_has_made and not game.finished:
                 game.updateScreen()
                 game.checkWin()
             if game.winner != "No winner" and not animation_in_process:
+                if game.winner == "X":
+                    game.playerX_turn = True
+                    game.playerO_turn = False
                 thread = threading.Thread(target=Player.afterMatchAnimation,
                                           args=(self.screen, self.screen_settings, game))
                 threads.append(thread)
@@ -48,8 +50,6 @@ class TTTi:
                     animation_in_process = False
                     game.resetGame()
                     game.updateScreen()
-                    game.winner = "No winner"
-                    game.finished = False
                     threads.pop()
             if animation_in_process and game.need_screen_update:
                 pygame.display.update()

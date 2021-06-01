@@ -8,6 +8,7 @@ class Player:
     def __init__(self, character):
         self.character = character
         self.clicked = False
+        self.place = (-1, -1)
         self.playing = True
 
     def checkEvents(self, screen, screen_settings, game):
@@ -26,20 +27,15 @@ class Player:
             self.playing = False
 
         if not self.clicked and self.playing and game.winner == "No winner":
-            return self._checkMOUSEBUTTONDOWN(screen_settings, game.board)
+            self._checkMOUSEBUTTONDOWN(screen_settings)
 
-        return None, None
-
-    def _checkMOUSEBUTTONDOWN(self, screen_settings, board):
+    def _checkMOUSEBUTTONDOWN(self, screen_settings):
         if pygame.mouse.get_pressed(num_buttons=3)[0]:
             mouse_pos = pygame.mouse.get_pos()
             x = mouse_pos[0] // screen_settings.square_width
             y = mouse_pos[1] // screen_settings.square_height
-            if x in [0, 1, 2] and y in [0, 1, 2]:
-                if not board[y][x]:
-                    self.clicked = True
-                    return y, x
-        return None, None
+            self.place = (x, y)
+            self.clicked = True
 
     @staticmethod
     def _drawO(screen, screen_settings, pos, color=(255, 255, 255), bg_color=(0, 0, 0)):
