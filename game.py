@@ -112,7 +112,7 @@ class SinglePlayerGame(Game):
                 self.playing = False
                 return
             self.move(self.p1.place[1], self.p1.place[0])
-        elif self.playerO_turn or self.p2.clicked:
+        elif self.playerO_turn:
             self.p2.checkEvents(self.screen, self.screen_settings, self)
             if not self.p2.playing:
                 self.playing = False
